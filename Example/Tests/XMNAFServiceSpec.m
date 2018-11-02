@@ -9,7 +9,6 @@
 #import <Kiwi/Kiwi.h>
 #import <XMNAFNet/XMNAFNet.h>
 
-
 @interface XMNTestService : XMNAFService
 
 @end
