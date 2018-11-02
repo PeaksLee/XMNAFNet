@@ -53,6 +53,10 @@ NS_ASSUME_NONNULL_BEGIN
 /** api 请求的管理类 */
 @property (strong, nonatomic, nonnull, readonly) XMNAFService *service;
 
+
+@property (assign, nonatomic) NSTimeInterval startTime;
+@property (assign, nonatomic) NSTimeInterval endTime;
+
 /** 清除上次请求可能保留下来的相关数据 */
 - (void)clearResponseInfo;
 - (void)requestDidCompletedWithError:(nullable NSError *)error;

@@ -117,6 +117,7 @@ static inline NSURL * XMNAFNetworkCreateDownloadPath(NSString * downloadPath) {
     } else {
         datatask.priority = request.priority;
         request.datatask = datatask;
+        request.startTime = [[NSDate date] timeIntervalSince1970] * 1000;
         [datatask resume];
         __weak typeof(self) wSelf = self;
         [self performThreadSafeHandler:^{
@@ -214,7 +215,7 @@ static inline NSURL * XMNAFNetworkCreateDownloadPath(NSString * downloadPath) {
     } else {
         request.responseObject = responseObject;
     }
-    
+    request.endTime = [[NSDate date] timeIntervalSince1970] * 1000;
     [request requestDidCompletedWithError:error];
 }
 

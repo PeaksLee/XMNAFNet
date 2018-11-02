@@ -16,6 +16,7 @@
 #endif
 
 NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
+NSString *const kXMNAFNetworkDidCompletedNotification = @"com.XMFraker.kXMNAFNetworkDidCompletedNotification";
 
 @implementation XMNAFNetworkRequest
 @synthesize service = _service;
@@ -29,6 +30,8 @@ NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
     
     if (self = [super init]) {
 
+        _retryCount = 5;
+        _shouldRetry = YES;
         _priority = NSURLSessionTaskPriorityDefault;
         _requestMode = XMNAFNetworkRequestGET;
         _timeoutInterval = 10.f;
@@ -75,13 +78,9 @@ NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
         }
     }
     
-    if (self.requestParams.count) {
-        [desc appendFormat:@"\n{ Params: %@ } ", self.requestParams];
-    }
+    if (self.requestParams.count) [desc appendFormat:@"\n{ Params: %@ } ", self.requestParams];
     
-    if (self.error) {
-        [desc appendFormat:@"\n{ Error: %@ } ", self.error];
-    }
+    if (self.error) [desc appendFormat:@"\n{ Error: %@ } ", self.error];
     
     return [desc copy];
 }
@@ -102,13 +101,16 @@ NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
 
 - (void)loadData { [self startRequestWithParams:nil completionHandler:NULL]; }
 
-- (void)loadDataWithParams:(NSDictionary *)aParams {
+- (void)loadDataWithParams:(NSDictionary *)params {
     
-    [self startRequestWithParams:aParams completionHandler:NULL];
+    [self startRequestWithParams:params completionHandler:NULL];
 }
 
-- (void)loadDataWithPathParams:(NSDictionary *)pathParams
-                                        params:(NSDictionary *)params {
+- (void)loadDataWithPathParams:(nullable NSDictionary *)params {
+    [self startRequestWithParams:params completionHandler:NULL];
+}
+
+- (void)loadDataWithPathParams:(NSDictionary *)pathParams params:(NSDictionary *)params {
     
     NSMutableDictionary *allParams = [pathParams ? : @{} mutableCopy];
     if (params && [params isKindOfClass:[NSDictionary class]]) { [allParams addEntriesFromDictionary:params]; }
@@ -130,10 +132,10 @@ NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
     NSAssert(self.methodName, @"you must implements methodName in your class :%@",NSStringFromClass([self class]));
     
     /** 2. 判断当前网络是否可用, 网络不可用直接返回 */
-    if (!self.isReachable) {
-        [self requestDidCompletedWithError:kXMNAFNetworkError(NSURLErrorNotConnectedToInternet, @"当前网络不可用,请检查您的网络设置")];
-        return;
-    }
+//    if (!self.isReachable) {
+//        [self requestDidCompletedWithError:kXMNAFNetworkError(NSURLErrorNotConnectedToInternet, @"当前网络不可用,请检查您的网络设置")];
+//        return;
+//    }
     
 #if kXMNAFReachablityAvailable
     /** 3. 判断当前请求是否允许 */
@@ -235,13 +237,27 @@ NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
     self.error = nil;
     self.datatask = nil;
     self.fromCache = NO;
+    self.retryCount = 5;
     self.requestParams = nil;
     self.responseData = self.responseObject = self.responseJSONObject = self.responseString = nil;
 }
 
+static dispatch_once_t kXMNAFRetryTimeIntervalToken;
+static NSArray<NSNumber *> *kXMNAFRetryTimeInterval;
+
 - (void)requestDidCompletedWithError:(NSError *)error {
     
     self.error = error;
+    
+    if (self.shouldRetry) {
+        dispatch_once(&kXMNAFRetryTimeIntervalToken, ^{ kXMNAFRetryTimeInterval = @[@3.f, @2.f, @1.f, @.5f, @.25f]; });
+        self.retryCount --;
+        CGFloat timeInterval = [[kXMNAFRetryTimeInterval objectAtIndex:self.retryCount] floatValue];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeInterval * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.service startRequest:self];
+        });
+        return;
+    }
     
 #if kXMNAFCacheAvailable
     if (self.error == nil) {
@@ -278,6 +294,9 @@ NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
     self.fromCache = NO;
     if (self.ignoredCancelledRequest && self.isCancelled) { return; }
     [self requestCallBackOnMainThread];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kXMNAFNetworkDidCompletedNotification object:self];
+    });
 }
 
 #if kXMNAFCacheAvailable
@@ -321,6 +340,20 @@ NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
 }
 
 #pragma mark - Getters
+
+- (BOOL)shouldRetry {
+    
+    BOOL retry = YES;
+    @synchronized (self) { retry = _shouldRetry; }
+    switch (self.error.code) {
+        case NSURLErrorCannotFindHost:
+        case NSURLErrorCannotConnectToHost:
+        case NSURLErrorNetworkConnectionLost:
+        case NSURLErrorNotConnectedToInternet:
+            return retry && self.retryCount >= 1;
+        default: return NO;
+    }
+}
 
 - (BOOL)isReachable {
     
@@ -367,13 +400,21 @@ NSString *const kXMNAFNetworkErrorDomain = @"com.XMFraker.XMNAFNetwork.Domain";
 
 
 @implementation XMNAFNetworkRequest (Convenient)
+- (NSInteger)responseCode { return self.response.statusCode; }
 - (NSURLRequest *)currentRequest { return self.datatask.currentRequest; }
 - (NSURLRequest *)originalRequest { return self.datatask.originalRequest; }
-- (NSHTTPURLResponse *)response { return (NSHTTPURLResponse *)self.datatask.response; }
-- (NSInteger)responseCode { return self.response.statusCode; }
 - (NSDictionary *)responseHeaders { return self.response.allHeaderFields; }
+- (NSHTTPURLResponse *)response { return (NSHTTPURLResponse *)self.datatask.response; }
 @end
 
 @implementation XMNAFNetworkRequest (Response)
 - (BOOL)isFromCache { return _fromCache; }
+@end
+
+@implementation XMNAFNetworkRequest (Stat)
+
+- (NSDictionary *)statInfo {
+    return @{ @"startTime" : @(self.startTime), @"endTime" : @(self.endTime) };
+}
+
 @end

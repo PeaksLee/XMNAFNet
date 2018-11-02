@@ -26,4 +26,6 @@ FOUNDATION_EXTERN NSString * _Nullable XMNAF_MD5(NSString * _Nonnull str);
 FOUNDATION_EXTERN NSError * _Nonnull kXMNAFNetworkError(NSInteger code, NSString * __nullable message);
 FOUNDATION_EXPORT NSString *__nonnull const kXMNAFNetworkErrorDomain;
 
+FOUNDATION_EXPORT NSString *__nonnull const kXMNAFNetworkDidCompletedNotification;
+
 #endif /* XMNAFNetworkConfiguration_h */

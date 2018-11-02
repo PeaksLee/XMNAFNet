@@ -138,6 +138,10 @@ typedef void(^XMNAFNetworkProgressHandler)(NSProgress *__nullable progress);
 
 /** api 请求的优先级 默认 NSURLSessionTaskPriorityDefault */
 @property (assign, atomic) float priority;
+/** api 无网络时是否可以重试  默认 YES */
+@property (assign, atomic) BOOL shouldRetry;
+/** api 无网络时重试次数  默认 5 */
+@property (assign, atomic) NSUInteger retryCount;
 /** api 请求相关头部授权信息 默认 nil */
 @property (copy, atomic, nullable)   NSArray<NSString *> *authorizationHeaderFields;
 /** api 请求是否允许使用蜂窝网络, 默认YES */
@@ -165,6 +169,7 @@ typedef void(^XMNAFNetworkProgressHandler)(NSProgress *__nullable progress);
  */
 - (void)loadData;
 - (void)loadDataWithParams:(nullable NSDictionary *)params;
+- (void)loadDataWithPathParams:(nullable NSDictionary *)params;
 - (void)loadDataWithPathParams:(nullable NSDictionary *)pathParams params:(nullable NSDictionary *)params;
 /** 开始请求 */
 - (void)startRequest;
@@ -233,4 +238,8 @@ typedef void(^XMNAFNetworkProgressHandler)(NSProgress *__nullable progress);
 /** response.allHeaderFields 快捷方式 */
 @property (copy, nonatomic, readonly, nullable)   NSDictionary *responseHeaders;
 
+@end
+
+@interface XMNAFNetworkRequest (Stat)
+@property (copy, nonatomic, readonly)   NSDictionary *statInfo;
 @end

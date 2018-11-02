@@ -26,6 +26,7 @@
 - (instancetype)initWithRequest:(__kindof XMNAFNetworkRequest *)request {
     if (!request) return nil;
     if (self = [super init]) {
+        
         _cachedVersion = request.cacheVersion;
         _cachedResponseHeaders = request.responseHeaders;
         _expiredDate = [NSDate dateWithTimeIntervalSinceNow:request.cacheTime];
