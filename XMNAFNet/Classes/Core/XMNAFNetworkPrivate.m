@@ -13,10 +13,15 @@
 static inline NSStringEncoding kXMNAFNetworkEncodingFromRequest(__kindof XMNAFNetworkRequest *request) {
     // From AFNetworking 2.6.3
     NSStringEncoding stringEncoding = NSUTF8StringEncoding;
-    if (request.response.textEncodingName) {
-        CFStringEncoding encoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)request.response.textEncodingName);
-        if (encoding != kCFStringEncodingInvalidId) {
-            stringEncoding = CFStringConvertEncodingToNSStringEncoding(encoding);
+    NSString *encodingName = request.response.textEncodingName;
+    if ([encodingName respondsToSelector:@selector(length)] && encodingName.length) {
+        CFStringRef name = (__bridge CFStringRef)encodingName;
+        // check name is nil, give up next logic, otherwise CFStringConvertIANACharSetNameToEncoding will be crash
+        if (name != nil) {
+            CFStringEncoding encoding = CFStringConvertIANACharSetNameToEncoding(name);
+            if (encoding != kCFStringEncodingInvalidId) {
+                stringEncoding = CFStringConvertEncodingToNSStringEncoding(encoding);
+            }
         }
     }
     return stringEncoding;

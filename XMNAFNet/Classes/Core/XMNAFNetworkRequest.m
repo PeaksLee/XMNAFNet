@@ -22,6 +22,7 @@ NSString *const kXMNAFNetworkDidCompletedNotification = @"com.XMFraker.kXMNAFNet
 @synthesize service = _service;
 @synthesize methodName = _methodName;
 @synthesize requestMode = _requestMode;
+@synthesize shouldRetry = _shouldRetry;
 @synthesize serviceIdentifier = _serviceIdentifier;
 @synthesize allowsCellularAccess = _allowsCellularAccess;
 #pragma mark - Life Cycle
@@ -337,6 +338,10 @@ static NSArray<NSNumber *> *kXMNAFRetryTimeInterval;
 
 - (void)setAllowsCellularAccess:(BOOL)allowsCellularAccess {
     @synchronized (self) { _allowsCellularAccess = allowsCellularAccess; }
+}
+
+- (void)setShouldRetry:(BOOL)shouldRetry {
+    @synchronized (self) { _shouldRetry = shouldRetry; }
 }
 
 #pragma mark - Getters
