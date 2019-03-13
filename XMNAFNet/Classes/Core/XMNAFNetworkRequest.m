@@ -158,7 +158,11 @@ NSString *const kXMNAFNetworkDidCompletedNotification = @"com.XMFraker.kXMNAFNet
     if ([self.paramSource respondsToSelector:@selector(paramsForRequest:)]) {
         [requestParams addEntriesFromDictionary:[self.paramSource paramsForRequest:self]];
     }
-    
+
+    if ([self.paramSource respondsToSelector:@selector(signedParamsForRequest:withOriginParams:)]) {
+        [requestParams addEntriesFromDictionary:[self.paramSource signedParamsForRequest:self withOriginParams:requestParams]];
+    }
+
     if ([self.interceptor respondsToSelector:@selector(request:shouldContinueWithParams:)]) {
         BOOL shouldContinue = [self.interceptor request:self shouldContinueWithParams:requestParams];
         if (!shouldContinue) { return; }

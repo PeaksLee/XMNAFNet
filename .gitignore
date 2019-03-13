@@ -31,3 +31,5 @@ Carthage
 # `pod install` in .travis.yml
 #
 Pods/
+Example/XMNAFNet.xcodeproj/xcshareddata/xcschemes/XMNAFNet_Tests.xcscheme
+Example/XMNAFNet.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist

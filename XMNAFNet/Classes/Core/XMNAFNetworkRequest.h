@@ -56,6 +56,7 @@ typedef NS_ENUM (NSUInteger, XMNAFNetworkRequestMode) {
 @protocol XMNAFNetworkRequestParamSource <NSObject>
 
 - (NSDictionary * _Nullable)paramsForRequest:(XMNAFNetworkRequest * _Nonnull)request;
+- (NSDictionary * _Nullable)signedParamsForRequest:(XMNAFNetworkRequest * _Nonnull)request withOriginParams:(NSDictionary *)originParams;
 
 @end
 
