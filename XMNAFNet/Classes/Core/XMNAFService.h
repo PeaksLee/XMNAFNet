@@ -70,6 +70,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** 执行一个线程安全的handler回调 */
 - (void)performThreadSafeHandler:(dispatch_block_t)handler;
 
+/** 获取加密相关参数, 并添加到请求头部内 */
+- (nullable NSDictionary<NSString *, NSString *> *)signedParamsForRequest:(nonnull NSURLRequest *)request;
+
 @end
 
 /** XMNAFService的相关存储操作, 线程安全 */

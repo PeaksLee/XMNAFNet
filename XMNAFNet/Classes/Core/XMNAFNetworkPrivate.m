@@ -132,6 +132,24 @@ static inline NSURL * XMNAFNetworkCreateDownloadPath(NSString * downloadPath) {
     }
 }
 
+- (NSMutableURLRequest *)mutableURLRequestWithHTTPMethod:(NSString *)method
+                                               URLString:(NSString *)URLString
+                                                  params:(nullable NSDictionary *)params
+                                     constructingHandler:(nullable XMNAFNetworkConstructingHandler)constructingHandler
+                                                   error:(NSError * _Nullable __autoreleasing *)error {
+    NSMutableURLRequest *request = nil;
+    if (constructingHandler) {
+        request = [self.sessionManager.requestSerializer multipartFormRequestWithMethod:method URLString:URLString parameters:params constructingBodyWithBlock:constructingHandler error:error];
+    } else {
+        request = [self.sessionManager.requestSerializer requestWithMethod:method URLString:URLString parameters:params error:error];
+    }
+    NSDictionary<NSString *, NSString *> *signedParams = [self signedParamsForRequest:request];
+    [signedParams enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        if (key && obj) [request setValue:obj forHTTPHeaderField:key];
+    }];
+    return request;
+}
+
 - (NSURLSessionDataTask *)dataTaskWithHTTPMethod:(NSString *)method
                                        URLString:(NSString *)URLString
                                           params:(nullable NSDictionary *)params
@@ -139,12 +157,7 @@ static inline NSURL * XMNAFNetworkCreateDownloadPath(NSString * downloadPath) {
                              constructingHandler:(nullable XMNAFNetworkConstructingHandler)constructingHandler
                                            error:(NSError * _Nullable __autoreleasing *)error {
     
-    NSMutableURLRequest *request = nil;
-    if (constructingHandler) {
-        request = [self.sessionManager.requestSerializer multipartFormRequestWithMethod:method URLString:URLString parameters:params constructingBodyWithBlock:constructingHandler error:error];
-    } else {
-        request = [self.sessionManager.requestSerializer requestWithMethod:method URLString:URLString parameters:params error:error];
-    }
+    NSMutableURLRequest *request = [self mutableURLRequestWithHTTPMethod:method URLString:URLString params:params constructingHandler:constructingHandler error:error];
     __weak typeof(self) wSelf = self;
     __block NSURLSessionDataTask *task = [self.sessionManager dataTaskWithRequest:request uploadProgress:progressHandler downloadProgress:progressHandler completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
         __strong typeof(wSelf) self = wSelf;
@@ -160,7 +173,7 @@ static inline NSURL * XMNAFNetworkCreateDownloadPath(NSString * downloadPath) {
                                                      error:(NSError * _Nullable __autoreleasing *)error {
     
     __weak typeof(self) wSelf = self;
-    NSMutableURLRequest *request = [self.sessionManager.requestSerializer requestWithMethod:@"GET" URLString:URLString parameters:params error:error];
+    NSMutableURLRequest *request = [self mutableURLRequestWithHTTPMethod:@"GET" URLString:URLString params:params constructingHandler:nil error:error];
     __block NSURLSessionDownloadTask *downloadTask = [self.sessionManager downloadTaskWithRequest:request progress:^(NSProgress *progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             progressHandler ? progressHandler(progress) : nil;

@@ -109,6 +109,8 @@ NSError *__nonnull kXMNAFNetworkError(NSInteger code, NSString * __nullable mess
     pthread_mutex_unlock(&_lock);
 }
 
+- (nullable NSDictionary<NSString *, NSString *> *)signedParamsForRequest:(nonnull NSURLRequest *)request { return nil; }
+
 #pragma mark - Setter
 
 - (void)setRequestSerializerType:(XMNAFRequestSerializerType)type {
