@@ -143,9 +143,12 @@ static inline NSURL * XMNAFNetworkCreateDownloadPath(NSString * downloadPath) {
     } else {
         request = [self.sessionManager.requestSerializer requestWithMethod:method URLString:URLString parameters:params error:error];
     }
-    NSDictionary<NSString *, NSString *> *signedParams = [self signedParamsForRequest:request];
-    [signedParams enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-        if (key && obj) [request setValue:obj forHTTPHeaderField:key];
+    NSMutableDictionary<NSString *, NSString *> *headers = [NSMutableDictionary dictionaryWithDictionary:self.commonHeaders];
+    NSDictionary<NSString *, NSString *> *signedHeaders = [self signedParamsForRequest:request];
+    if (signedHeaders.count) { [headers addEntriesFromDictionary:signedHeaders]; }
+    [headers enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSString * _Nonnull obj, BOOL * _Nonnull stop) {
+        if (key && obj && [key isKindOfClass:[NSString class]] && [obj isKindOfClass:[NSString class]])
+            [request addValue:obj forHTTPHeaderField:key];
     }];
     return request;
 }
