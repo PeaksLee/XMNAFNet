@@ -48,7 +48,6 @@ typedef void(^XMNAFReachabilityStatusChangedHandler)(XMNAFReachablityStatus stat
 @property (nonatomic, assign, readonly, getter=isNetworkEnable) BOOL networkEnable;
 @property (nonatomic, assign, readonly, getter=isHighSpeedNetwork) BOOL highSpeedNetwork;
 
-
 @property (nonatomic, weak)   id<XMNAFReachabilityDelegate> delegate;
 @property (nonatomic, copy)   XMNAFReachabilityStatusChangedHandler statusDidChangedBlock;
 
@@ -65,22 +64,17 @@ typedef void(^XMNAFReachabilityStatusChangedHandler)(XMNAFReachablityStatus stat
 
 /**
  *  @brief wifi是否可用
- *
  */
-+(BOOL)isWifiEnable;
++ (BOOL)isWifiEnable;
 
 /**
  *  @brief 网络是否可用
- *
- *  @return YES or NO
  */
-+(BOOL)isNetworkEnable;
++ (BOOL)isNetworkEnable;
 
 /**
  *  @brief 是否有告诉网络可用
- *
- *  @return YES or NO
  */
-+(BOOL)isHighSpeedNetwork;
++ (BOOL)isHighSpeedNetwork;
 
 @end

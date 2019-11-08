@@ -12,9 +12,6 @@
 		6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
 		6003F5BA195388D20070C39A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5B8195388D20070C39A /* InfoPlist.strings */; };
 		898849A990B9EADF439D670A /* Pods_XMNAFNet_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C184693F6DDDFBAC6CEC9C97 /* Pods_XMNAFNet_Tests.framework */; };
-		9780B85F218C251D00333730 /* NSString+WMExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 9780B85E218C251D00333730 /* NSString+WMExtension.m */; };
-		9780B862218C269000333730 /* UILabel+XMN.m in Sources */ = {isa = PBXBuildFile; fileRef = 9780B861218C269000333730 /* UILabel+XMN.m */; };
-		97C891981EC9A6FB00D14E61 /* XMNAFServiceSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C891971EC9A6FB00D14E61 /* XMNAFServiceSpec.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,12 +24,7 @@
 		6003F5B9195388D20070C39A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		73FB7AE4D18DDE5BB338D7A3 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		7645513EB3D515343ED2F593 /* XMNAFNet.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = XMNAFNet.podspec; path = ../XMNAFNet.podspec; sourceTree = "<group>"; };
-		9780B85D218C251D00333730 /* NSString+WMExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+WMExtension.h"; sourceTree = "<group>"; };
-		9780B85E218C251D00333730 /* NSString+WMExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+WMExtension.m"; sourceTree = "<group>"; };
-		9780B860218C269000333730 /* UILabel+XMN.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UILabel+XMN.h"; sourceTree = "<group>"; };
-		9780B861218C269000333730 /* UILabel+XMN.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UILabel+XMN.m"; sourceTree = "<group>"; };
-		97C891971EC9A6FB00D14E61 /* XMNAFServiceSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMNAFServiceSpec.m; sourceTree = "<group>"; };
+		7645513EB3D515343ED2F593 /* XMNAFNet.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = XMNAFNet.podspec; path = ../XMNAFNet.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A16BECC31185B4D3AA9EAFE8 /* Pods-XMNAFNet_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XMNAFNet_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-XMNAFNet_Tests/Pods-XMNAFNet_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		C184693F6DDDFBAC6CEC9C97 /* Pods_XMNAFNet_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XMNAFNet_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2F6450FED147DE4A9A1C063 /* Pods-XMNAFNet_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XMNAFNet_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-XMNAFNet_Tests/Pods-XMNAFNet_Tests.release.xcconfig"; sourceTree = "<group>"; };
@@ -89,11 +81,6 @@
 			isa = PBXGroup;
 			children = (
 				6003F5B6195388D20070C39A /* Supporting Files */,
-				97C891971EC9A6FB00D14E61 /* XMNAFServiceSpec.m */,
-				9780B85D218C251D00333730 /* NSString+WMExtension.h */,
-				9780B85E218C251D00333730 /* NSString+WMExtension.m */,
-				9780B860218C269000333730 /* UILabel+XMN.h */,
-				9780B861218C269000333730 /* UILabel+XMN.m */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -139,7 +126,6 @@
 				6003F5AB195388D20070C39A /* Frameworks */,
 				6003F5AC195388D20070C39A /* Resources */,
 				44556EF5B912FC0FCC579DFB /* [CP] Embed Pods Frameworks */,
-				EC2812401531076A69E561F7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -165,6 +151,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -196,10 +183,10 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-XMNAFNet_Tests/Pods-XMNAFNet_Tests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-XMNAFNet_Tests/Pods-XMNAFNet_Tests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework",
 				"${BUILT_PRODUCTS_DIR}/Kiwi/Kiwi.framework",
-				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
+				"${BUILT_PRODUCTS_DIR}/RealReachability/RealReachability.framework",
 				"${BUILT_PRODUCTS_DIR}/XMNAFNet/XMNAFNet.framework",
 				"${BUILT_PRODUCTS_DIR}/YYCache/YYCache.framework",
 				"${BUILT_PRODUCTS_DIR}/YYModel/YYModel.framework",
@@ -208,14 +195,14 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AFNetworking.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kiwi.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealReachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/XMNAFNet.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/YYCache.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/YYModel.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-XMNAFNet_Tests/Pods-XMNAFNet_Tests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-XMNAFNet_Tests/Pods-XMNAFNet_Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		9DDBB192E643D01E234FCEDD /* [CP] Check Pods Manifest.lock */ = {
@@ -236,21 +223,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EC2812401531076A69E561F7 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-XMNAFNet_Tests/Pods-XMNAFNet_Tests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -258,9 +230,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				97C891981EC9A6FB00D14E61 /* XMNAFServiceSpec.m in Sources */,
-				9780B862218C269000333730 /* UILabel+XMN.m in Sources */,
-				9780B85F218C251D00333730 /* NSString+WMExtension.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

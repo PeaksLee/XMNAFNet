@@ -353,7 +353,7 @@ static NSArray<NSNumber *> *kXMNAFRetryTimeInterval;
 - (BOOL)shouldRetry {
     
     BOOL retry = YES;
-    @synchronized (self) { retry = _shouldRetry; }
+    @synchronized (self) { retry = _shouldRetry && [self isReachable]; }
     switch (self.error.code) {
         case NSURLErrorCannotFindHost:
         case NSURLErrorCannotConnectToHost:
@@ -367,7 +367,10 @@ static NSArray<NSNumber *> *kXMNAFRetryTimeInterval;
 - (BOOL)isReachable {
     
 #if kXMNAFReachablityAvailable
-    if ([XMNAFReachabilityManager sharedManager].isMonitoring) return [XMNAFReachabilityManager isNetworkEnable];
+    if ([XMNAFReachabilityManager sharedManager].isMonitoring) {
+        if (self.isAllowsCellularAccess) return [XMNAFReachabilityManager isNetworkEnable];
+        else return [XMNAFReachabilityManager isWifiEnable];
+    }
     return YES;
 #else
     return YES;

@@ -7,7 +7,7 @@
 //
 
 #import "XMNAFReachabilityManager.h"
-#import <Reachability/Reachability.h>
+#import <RealReachability/RealReachability.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import "XMNAFNetworkConfiguration.h"
 
@@ -17,18 +17,7 @@ NSString *kXMNAFReachabilityStatusStringKey = @"com.XMFraker.XMNAFNetwork.kXMNAF
 
 @interface XMNAFReachabilityManager ()
 
-/** 2G数组 */
-@property (nonatomic,strong, readonly) NSArray *technology2GArray;
-/** 3G数组 */
-@property (nonatomic,strong, readonly) NSArray *technology3GArray;
-/** 4G数组 */
-@property (nonatomic,strong, readonly) NSArray *technology4GArray;
-
-@property (nonatomic,strong) Reachability *reachability;
-
-@property (nonatomic,strong) CTTelephonyNetworkInfo *telephonyNetworkInfo;
-
-@property (nonatomic,copy, readonly)   NSString *currentRaioAccess;
+@property (nonatomic,strong) RealReachability *reachability;
 
 @property (nonatomic, assign) XMNAFReachablityStatus lastStatus;
 /** 是否正在监听 */
@@ -48,8 +37,6 @@ NSString *kXMNAFReachabilityStatusStringKey = @"com.XMFraker.XMNAFNetwork.kXMNAF
     });
     return manager;
 }
-
-+ (void)initialize { [[XMNAFReachabilityManager sharedManager] telephonyNetworkInfo]; }
 
 - (void)dealloc { [self stopMonitoring]; }
 
@@ -84,15 +71,11 @@ NSString *kXMNAFReachabilityStatusStringKey = @"com.XMFraker.XMNAFNetwork.kXMNAF
     
     self.delegate = delegate;
     self.statusDidChangedBlock = handler;
-    
-    if (URL) {
-        self.reachability = [Reachability reachabilityWithHostName:[URL host]];
-    } else {
-        self.reachability = [Reachability reachabilityForInternetConnection];
-    }
+    self.reachability = [[RealReachability alloc] init];
+    self.reachability.hostForPing = URL.host ? : @"www.baidu.com";
+    self.reachability.hostForCheck = URL.host ? : @"www.baidu.com";
     /** 注册监听函数 */
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleStatusChanged:) name:kReachabilityChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleStatusChanged:) name:CTRadioAccessTechnologyDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleStatusChanged:) name:kRealReachabilityChangedNotification object:nil];
     [self.reachability startNotifier];
     self.lastStatus = self.status;
     self.monitoring = YES;
@@ -103,8 +86,7 @@ NSString *kXMNAFReachabilityStatusStringKey = @"com.XMFraker.XMNAFNetwork.kXMNAF
     if (!self.isMonitoring) { return; }
     
     /** 移除监听函数 */
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kReachabilityChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:CTRadioAccessTechnologyDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kRealReachabilityChangedNotification object:nil];
     [self.reachability stopNotifier];
     self.reachability = nil;
     self.monitoring = NO;
@@ -121,8 +103,7 @@ NSString *kXMNAFReachabilityStatusStringKey = @"com.XMFraker.XMNAFNetwork.kXMNAF
         }
         
         //如果状态发生变化,发送通知
-        NSDictionary *userInfo = @{kXMNAFReachabilityStatusKey:@(self.status),
-                                   kXMNAFReachabilityStatusStringKey:self.statusString};
+        NSDictionary *userInfo = @{ kXMNAFReachabilityStatusKey:@(self.status), kXMNAFReachabilityStatusStringKey:self.statusString };
         [[NSNotificationCenter defaultCenter] postNotificationName:kXMNAFReachabilityStatusChangedNotification object:self userInfo:userInfo];
         
         /** block回调 */
@@ -137,23 +118,19 @@ NSString *kXMNAFReachabilityStatusStringKey = @"com.XMFraker.XMNAFNetwork.kXMNAF
 
 - (XMNAFReachablityStatus)status {
     
-    XMNAFReachablityStatus status = (XMNAFReachablityStatus)[self.reachability currentReachabilityStatus];
-    
-    NSString *technology = self.currentRaioAccess;
-    
-    if (status == XMNAFReachablityStatusWWAN && technology) {
-        
-        if ([self.technology2GArray containsObject:technology]) {
-            return XMNAFReachablityStatus2G;
+    XMNAFReachablityStatus status = (ReachabilityStatus)[self.reachability currentReachabilityStatus];
+    if (status == RealStatusViaWWAN) {
+        switch (self.reachability.currentWWANtype) {
+            case WWANType4G: return XMNAFReachablityStatus4G;
+            case WWANType3G: return XMNAFReachablityStatus3G;
+            case WWANType2G: return XMNAFReachablityStatus2G;
+            default: return XMNAFReachablityStatusWWAN;
         }
-        if ([self.technology3GArray containsObject:technology]) {
-            return XMNAFReachablityStatus3G;
-        }
-        if ([self.technology4GArray containsObject:technology]) {
-            return XMNAFReachablityStatus4G;
-        }
+    } else if (status == RealStatusViaWiFi) {
+        return XMNAFReachablityStatusWifi;
+    } else {
+        return XMNAFReachablityStatusUnknown;
     }
-    return status;
 }
 
 - (NSString *)statusString {
@@ -174,19 +151,6 @@ NSString *kXMNAFReachabilityStatusStringKey = @"com.XMFraker.XMNAFNetwork.kXMNAF
     }
 }
 
--(CTTelephonyNetworkInfo *)telephonyNetworkInfo{
-    
-    if(!_telephonyNetworkInfo){
-        _telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
-    }
-    return _telephonyNetworkInfo;
-}
-
-- (NSString *)currentRaioAccess {
-    
-    return self.telephonyNetworkInfo.currentRadioAccessTechnology;
-}
-
 /**
  *  @brief 是否正在监听中
  *
@@ -201,57 +165,21 @@ NSString *kXMNAFReachabilityStatusStringKey = @"com.XMFraker.XMNAFNetwork.kXMNAF
     return self.status == XMNAFReachablityStatus4G || self.status == XMNAFReachablityStatusWifi || self.status == XMNAFReachablityStatus3G;
 }
 
-/** @brief 2G数组 */
--(NSArray *)technology2GArray{ return @[CTRadioAccessTechnologyEdge,CTRadioAccessTechnologyGPRS]; }
-
-
-/** @brief 3G数组 */
--(NSArray *)technology3GArray{
-    
-    return @[
-             CTRadioAccessTechnologyHSDPA,
-             CTRadioAccessTechnologyWCDMA,
-             CTRadioAccessTechnologyHSUPA,
-             CTRadioAccessTechnologyCDMA1x,
-             CTRadioAccessTechnologyCDMAEVDORev0,
-             CTRadioAccessTechnologyCDMAEVDORevA,
-             CTRadioAccessTechnologyCDMAEVDORevB,
-             CTRadioAccessTechnologyeHRPD
-             ];
-}
-
-/** @brief 4G数组 */
--(NSArray *)technology4GArray{ return @[CTRadioAccessTechnologyLTE]; }
-
 #pragma mark - Class Methods
 
 /**
  *  @brief wifi是否可用
- *
  */
-+ (BOOL)isWifiEnable {
-    
-    return [XMNAFReachabilityManager sharedManager].isWifiEnable;
-}
++ (BOOL)isWifiEnable { return [XMNAFReachabilityManager sharedManager].isWifiEnable; }
 
 /**
  *  @brief 网络是否可用
- *
- *  @return YES or NO
  */
-+ (BOOL)isNetworkEnable {
-    
-    return [XMNAFReachabilityManager sharedManager].isNetworkEnable;
-}
++ (BOOL)isNetworkEnable { return [XMNAFReachabilityManager sharedManager].isNetworkEnable; }
 
 /**
  *  @brief 是否有告诉网络可用
- *
- *  @return YES or NO
  */
-+ (BOOL)isHighSpeedNetwork {
-    
-    return [XMNAFReachabilityManager sharedManager].isHighSpeedNetwork;
-}
++ (BOOL)isHighSpeedNetwork { return [XMNAFReachabilityManager sharedManager].isHighSpeedNetwork; }
 
 @end

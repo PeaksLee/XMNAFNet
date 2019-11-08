@@ -4,8 +4,6 @@
 //  Created by  XMFraker on 2018/5/21
 //  Copyright © XMFraker All rights reserved. (https://github.com/ws00801526)
 //  @class      XMNAFNetworkPrivate
-//  @version    <#class version#>
-//  @abstract   <#class description#>
 
 #import "XMNAFNetworkPrivate.h"
 #import "XMNAFNetworkConfiguration.h"
