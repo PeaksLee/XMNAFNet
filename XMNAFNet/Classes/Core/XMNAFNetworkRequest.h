@@ -56,7 +56,7 @@ typedef NS_ENUM (NSUInteger, XMNAFNetworkRequestMode) {
 @protocol XMNAFNetworkRequestParamSource <NSObject>
 
 - (NSDictionary * _Nullable)paramsForRequest:(XMNAFNetworkRequest * _Nonnull)request;
-- (NSDictionary * _Nullable)signedParamsForRequest:(XMNAFNetworkRequest * _Nonnull)request withOriginParams:(NSDictionary *)originParams;
+- (NSDictionary * _Nullable)signedParamsForRequest:(XMNAFNetworkRequest * _Nonnull)request withOriginParams:(NSDictionary * _Nullable)originParams;
 
 @end
 
@@ -242,5 +242,5 @@ typedef void(^XMNAFNetworkProgressHandler)(NSProgress *__nullable progress);
 @end
 
 @interface XMNAFNetworkRequest (Stat)
-@property (copy, nonatomic, readonly)   NSDictionary *statInfo;
+@property (copy, nonatomic, readonly, nullable)   NSDictionary *statInfo;
 @end
