@@ -146,7 +146,7 @@ static inline NSURL * XMNAFNetworkCreateDownloadPath(NSString * downloadPath) {
     if (signedHeaders.count) { [headers addEntriesFromDictionary:signedHeaders]; }
     [headers enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSString * _Nonnull obj, BOOL * _Nonnull stop) {
         if (key && obj && [key isKindOfClass:[NSString class]] && [obj isKindOfClass:[NSString class]])
-            [request addValue:obj forHTTPHeaderField:key];
+            [request setValue:obj forHTTPHeaderField:key];
     }];
     return request;
 }
