@@ -28,7 +28,7 @@ static NSMutableSet *kXMNAFNetworkRequests = nil;
     if (!kXMNAFNetworkRequests) { kXMNAFNetworkRequests = [NSMutableSet set]; }
     
     XMNAFCacheMetaHandler mainHandler = ^(XMNAFCacheMeta *__nullable meta, NSError *__nullable error) {
-        dispatch_queue_t queue = self.service.sessionManager.completionQueue ? : dispatch_get_main_queue();
+        dispatch_queue_t queue = self.service.completionQueue ? : dispatch_get_main_queue();
         dispatch_async(queue, ^{
             if (handler) { handler(meta, error); }
             [kXMNAFNetworkRequests removeObject:self];

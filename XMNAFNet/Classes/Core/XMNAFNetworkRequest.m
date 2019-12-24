@@ -221,7 +221,7 @@ NSString *const kXMNAFNetworkDidCompletedNotification = @"com.XMFraker.kXMNAFNet
         __weak typeof(self) wSelf = self;
         [(NSURLSessionDownloadTask *)self.datatask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
             __strong typeof(wSelf) self = wSelf;
-            dispatch_async(self.service.sessionManager.completionQueue, ^{
+            dispatch_async(self.service.completionQueue, ^{
                 __strong typeof(wSelf) self = wSelf;
                 if (resumeData != nil) {
                     [self.service.cache.diskCache setObject:resumeData forKey:self.cacheKey];
