@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'XMNAFNet'
-  s.version          = '0.5.6'
+  s.version          = '0.5.8'
   s.summary          = '基于AFNetworking封装的网络请求类库'
   s.homepage         = 'https://github.com/ws00801526/XMNAFNet'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -19,7 +19,10 @@ Pod::Spec.new do |s|
 
   s.subspec 'Core' do |ss|
     ss.source_files = 'XMNAFNet/Classes/Core/*.{h,m}'
-    ss.dependency 'AFNetworking'
+    ss.dependency 'AFNetworking/Security'
+    ss.dependency 'AFNetworking/Reachability'
+    ss.dependency 'AFNetworking/NSURLSession'
+    ss.dependency 'AFNetworking/Serialization'
   end
 
   s.subspec 'Tools' do |ss|
