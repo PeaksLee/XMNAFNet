@@ -63,8 +63,9 @@ static NSString *kXMNAFDownloadTaskProgressKey;
         if (![[NSFileManager defaultManager] fileExistsAtPath:self.downloadedCachePath]) {
             [[NSFileManager defaultManager] createDirectoryAtPath:self.downloadedCachePath withIntermediateDirectories:YES attributes:nil error:NULL];
         }
-        
-        XMNLog(@"-------XMNAFNetwork Download Path---------\ndownloading cache path:\n%@\ndownloaded cache path:\n%@\n-------XMNAFNetwork Download Path---------\n\n\n",self.downloadingCachePath,self.downloadedCachePath);
+#if DEBUG
+        NSLog(@"downloading path :%@ -- cache path :%@", self.downloadingCachePath, self.downloadedCachePath);
+#endif
     }
     return self;
 }
@@ -76,13 +77,7 @@ static NSString *kXMNAFDownloadTaskProgressKey;
                                       progressBlock:(void (^)(int64_t, int64_t))progressBlock
                                       completeBlock:(void (^)(id _Nullable, NSError * _Nullable))completeBlock {
     
-    
-    if (!URLString) {
-        
-        XMNLog(@"you should pass URLString");
-        return nil;
-    }
-    
+    NSAssert(URLString.length > 0, @"url should not be nil");
     NSString *resultFileName = fileName ?  : XMNAF_MD5(URLString);
     
     NSString *fileDownloadingPath = [self.downloadingCachePath stringByAppendingPathComponent:resultFileName];
@@ -126,28 +121,17 @@ static NSString *kXMNAFDownloadTaskProgressKey;
 }
 
 
-- (NSURLSessionDownloadTask *)downloadWithConstructingRequestBlock:(NSDictionary * _Nonnull (^)(void))constructingRequestBlock
+- (NSURLSessionDownloadTask *)downloadWithConstructingRequestBlock:(NSDictionary * _Nonnull (^)(void))constructBlock
                                                      progressBlock:(void (^)(int64_t, int64_t))progressBlock
                                                      completeBlock:(void (^)(id _Nullable, NSError * _Nullable))completeBlock {
     
     
-    if (!constructingRequestBlock) {
-        
-        XMNLog(@"%@",XMNLocalizedString(@"NON_CONSTRUCT_BLOCK", @""));
-        return nil;
-    }
-    NSDictionary *arguments = constructingRequestBlock();
+    NSAssert(constructBlock != nil, @"consturct block should not be nil");
+    NSDictionary *arguments = constructBlock();
     NSString *URLString = arguments[kXMNAFDownloadURLStringKey];
-    if (!URLString) {
-        
-        XMNLog(@"%@",XMNLocalizedString(@"NON_CONSTRUCT_URL", @""));
-        return nil;
-    }
+    NSAssert(URLString.length > 0, @"url should not be nil");
     NSString *fileName = arguments[kXMNAFDownloadFileNameKey];
-    
-    if (!fileName) {
-        fileName = XMNAF_MD5(URLString);
-    }
+    if (fileName.length <= 0) fileName = XMNAF_MD5(URLString);
     return [self downloadWithURLString:URLString
                               fileName:fileName
                          progressBlock:progressBlock
@@ -185,12 +169,7 @@ static NSString *kXMNAFDownloadTaskProgressKey;
  */
 - (void)suspendTask:(NSString * _Nonnull)URLString {
     
-    if (!URLString) {
-
-        XMNLog(@"%@",XMNLocalizedString(@"SUSPEND_NON_URL", @"you should pass URLString while suspend task"));
-        return;
-    }
-    
+    NSAssert(URLString.length > 0, @"url should not be nil");
     [[self.downloadTasks filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSURLSessionDownloadTask  *evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         return [XMNAF_MD5(evaluatedObject.currentRequest.URL.absoluteString) isEqualToString:XMNAF_MD5(URLString)] && evaluatedObject.state == NSURLSessionTaskStateRunning;
     }]] makeObjectsPerformSelector:@selector(suspend)];
@@ -204,12 +183,7 @@ static NSString *kXMNAFDownloadTaskProgressKey;
  */
 - (void)resumeTask:(NSString * _Nonnull)URLString {
     
-    if (!URLString) {
-
-        XMNLog(@"%@",XMNLocalizedString(@"RESUME_NON_URL", @"you should pass URLString while resume task"));
-        return;
-    }
-    
+    NSAssert(URLString.length > 0, @"url should not be nil");
     [[self.downloadTasks filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSURLSessionDownloadTask  *evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         return [XMNAF_MD5(evaluatedObject.currentRequest.URL.absoluteString) isEqualToString:XMNAF_MD5(URLString)] && evaluatedObject.state == NSURLSessionTaskStateSuspended;
     }]] makeObjectsPerformSelector:@selector(resume)];
@@ -224,11 +198,7 @@ static NSString *kXMNAFDownloadTaskProgressKey;
  */
 - (void)cancelTask:(NSString * _Nonnull)URLString {
     
-    if (!URLString) {
-
-        XMNLog(@"%@",XMNLocalizedString(@"CANCEL_NON_URL", @"you should pass URLString while cancel task"));
-        return;
-    }
+    NSAssert(URLString.length > 0, @"url should not be nil");
     [[self.downloadTasks filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSURLSessionDownloadTask  *evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         
         return [XMNAF_MD5(evaluatedObject.currentRequest.URL.absoluteString) isEqualToString:XMNAF_MD5(URLString)];
@@ -248,11 +218,7 @@ static NSString *kXMNAFDownloadTaskProgressKey;
 
 - (void)cleanDownloadingCacheWithURLString:(NSString *)URLString {
     
-    if (!URLString) {
-
-        XMNLog(@"%@",XMNLocalizedString(@"CLEAN_DOWNING_NON_URL", @"you should pass URLString while clean downloading cache"));
-        return;
-    }
+    NSAssert(URLString.length > 0, @"url should not be nil");
     [[NSFileManager defaultManager] removeItemAtPath:[self.downloadingCachePath stringByAppendingString:XMNAF_MD5(URLString)] error:nil];
 }
 
@@ -264,11 +230,7 @@ static NSString *kXMNAFDownloadTaskProgressKey;
 
 - (void)cleanDownloadedCacheWithURLString:(NSString *)URLString {
     
-    if (!URLString) {
-        
-        XMNLog(@"%@",XMNLocalizedString(@"CLEAN_DOWNED_NON_URL", @"you should pass URLString while clean downloaded cache"));
-        return;
-    }
+    NSAssert(URLString.length > 0, @"url should not be nil");
     [[NSFileManager defaultManager] removeItemAtPath:[self.downloadedCachePath stringByAppendingString:XMNAF_MD5(URLString)] error:nil];
 }
 
@@ -281,11 +243,7 @@ static NSString *kXMNAFDownloadTaskProgressKey;
 
 - (void)cleanCacheWithURLString:(NSString *)URLString {
     
-    if (!URLString) {
-
-        XMNLog(@"%@",XMNLocalizedString(@"CLEAN_NON_URL", @"you should pass URLString while clean cache"));
-        return;
-    }
+    NSAssert(URLString.length > 0, @"url should not be nil");
     [self cleanDownloadedCacheWithURLString:URLString];
     [self cleanDownloadingCacheWithURLString:URLString];
 }

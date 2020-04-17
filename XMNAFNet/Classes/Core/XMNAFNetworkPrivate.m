@@ -41,20 +41,15 @@ static inline NSURL * XMNAFNetworkCreateDownloadPath(NSString * downloadPath) {
     
     BOOL isDir = YES;
     if (![[NSFileManager defaultManager] fileExistsAtPath:dirPath isDirectory:&isDir] || !isDir) {
-        XMNLog(@"downDir is not exists or is not a dir :%@, will recreate downDir", ((isDir == NO) ? @"YES" : @"NO"));
         NSError *error = nil;
         if (!isDir) { [[NSFileManager defaultManager] removeItemAtPath:dirPath error:&error]; }
         [[NSFileManager defaultManager] createDirectoryAtPath:dirPath withIntermediateDirectories:YES attributes:nil error:&error];
-        XMNLog(@"create dir error :%@", error);
     }
     
-    XMNLog(@"downDir is :%@",dirPath);
     NSString *absolutePath = [dirPath stringByAppendingPathComponent:filename];
     if ([[NSFileManager defaultManager] fileExistsAtPath:absolutePath]) {
-        XMNLog(@"downPath is exists some object, will remove object");
         [[NSFileManager defaultManager] removeItemAtPath:absolutePath error:nil];
     }
-    XMNLog(@"downPath is :%@",absolutePath);
     return [NSURL fileURLWithPath:absolutePath];
 }
 
