@@ -41,7 +41,8 @@ static NSMutableSet *kXMNAFNetworkRequests = nil;
     if ([self.service.cache containsObjectForKey:cacheKey]) {
         
         __weak typeof(self) wSelf = self;
-        [self.service.cache objectForKey:cacheKey withBlock:^(NSString * _Nonnull key, XMNAFCacheMeta *cacheMeta) {
+        [self.service.cache objectForKey:cacheKey withBlock:^(NSString * _Nonnull key, id<NSCoding>  _Nonnull object) {
+            XMNAFCacheMeta *cacheMeta = (XMNAFCacheMeta *)object;
             __strong typeof(wSelf) self = wSelf;
             if (!cacheMeta.isCahceDataValid) {
                 [self.service.cache removeObjectForKey:cacheKey];
