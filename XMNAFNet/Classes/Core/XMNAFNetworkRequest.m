@@ -35,7 +35,6 @@ NSString *const kXMNAFNetworkDidCompletedNotification = @"com.XMFraker.kXMNAFNet
         _shouldRetry = YES;
         _priority = NSURLSessionTaskPriorityDefault;
         _requestMode = XMNAFNetworkRequestGET;
-        _timeoutInterval = 10.f;
         _allowsCellularAccess = YES;
         _ignoredCancelledRequest = YES;
     }
@@ -52,6 +51,7 @@ NSString *const kXMNAFNetworkDidCompletedNotification = @"com.XMFraker.kXMNAFNet
         _requestMode = requestMode;
         _methodName = methodName;
         _serviceIdentifier = identifier;
+        _timeoutInterval = self.service.timeoutInterval;
     }
     return self;
 }

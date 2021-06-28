@@ -162,6 +162,8 @@ NSError *__nonnull kXMNAFNetworkError(NSInteger code, NSString * __nullable mess
 
 - (NSDictionary *)commonHeaders { return nil; }
 
+- (NSTimeInterval)timeoutInterval { return 10.f;}
+
 #if kXMNAFCacheAvailable
 
 - (NSString *)cachePath {
